@@ -16,3 +16,4 @@ This is my code for CS 317 Prgramming Assignment 1.
 - Print the sorted data to the output file. (Prompt the user for the number of words per line)
 - Take your newly sorted array and run Quicksort on it again.
 - Compute the % time longer it takes to sort the ordered list.
+- The solution must be written in C++ version 17 (not 20 or higher!)
