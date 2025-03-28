@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <chrono>
 
 using namespace std;
@@ -27,7 +28,6 @@ using namespace std;
 void quickSort(string arr[], int left, int right);
 int hoarePartition(string arr[], int left, int right);
 void swap(string* a, string* b);
-void printArray(string arr[], int size); 
 
 // Main function
 int main() {
@@ -40,12 +40,11 @@ int main() {
     string words[MAX];
 
     // Prompt user for filenames
+    cout << "Welcome to the sorting program!" << endl;
     cout << "Enter the name of the input file: ";
     cin >> input;
     cout << "Enter the name of the output file: ";
     cin >> output;
-    cout << "Enter the number of words to write per line: ";
-    cin >> M;
 
     // Open input file
     inputFile.open(input);
@@ -58,10 +57,20 @@ int main() {
 
     // Read file
     while (getline(inputFile, line)) {
-        words[count++] += word;  
+        istringstream iss(line);
+        while (iss >> word) {
+            words[count++] = word;
+        }
+          
     }
     // Close file
     inputFile.close();
+
+    // Print number of words read
+    cout << count << " words were found in the file: " << input << endl;
+    // Prompt user for number of words per line
+    cout << "How many words per line should be printed? ";
+    cin >> M;
 
     // Open output file
     outputFile.open(output);
@@ -70,6 +79,13 @@ int main() {
         cout << "Error: Output file not found." << endl;
         return 0;
     }
+
+    // Sort words using QuickSort
+    auto start = chrono::high_resolution_clock::now();      // Start timer
+    quickSort(words, 0, count - 1);                         // Sort words
+    auto end = chrono::high_resolution_clock::now();        // Stop timer
+    auto duration1 = chrono::duration_cast<chrono::microseconds>(end - start);   // Calculate time taken
+    cout << "The initial quicksort took  " << duration1.count() << " microseconds" << endl;
 
     // Write sorted words to output file
     for (int i = 0; i < count; i++) {
@@ -80,8 +96,21 @@ int main() {
             outputFile << " ";
         }
     }
+    cout << "Results printed to : " << output << endl;
     // Close file
     outputFile.close();
+
+    // Take sorted array and run Quicksort on it again
+    cout << "Resorting the already sorted list..." << endl;
+    auto start2 = chrono::high_resolution_clock::now(); // Start timer
+    quickSort(words, 0, count - 1);                     // Sort again
+    auto end2 = chrono::high_resolution_clock::now();   // Stop timer
+    auto duration2 = chrono::duration_cast<chrono::microseconds>(end2 - start2); // Calculate time taken
+    cout << "Time taken to sort again: " << duration2.count() << " microseconds" << endl;
+
+    // Compute the % time longer it takes to sort the ordered list
+    double percent = ((double)duration2.count() - (double)duration1.count()) / (double)duration1.count() * 100;
+    cout << "An increase of about " << round(percent) << "%" << endl; 
 
     return 0;
 }
@@ -121,11 +150,4 @@ void swap(string* a, string* b) {
     string temp = *a;
     *a = *b;
     *b = temp;
-}
-
-void printArray(string arr[], int size) {
-    for (int i = 0; i < size; i++) {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
 }
